@@ -1,18 +1,24 @@
-# SJTU-SE-BIGHOMEWORK
-sjtu软件工程大二学期大作业 支持多人协作的在线文档编辑网页
+# mytest
 
-第一次迭代日期:3.14
+## Project setup
+```
+npm install
+```
 
-目标：
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
 
-1.完成Vision文档（√）
+### Compiles and minifies for production
+```
+npm run build
+```
 
-2.完成logo设计（√）
+### Lints and fixes files
+```
+npm run lint
+```
 
-3.完成界面原型开发和静态页面搭建（√）
-
-
-
-迭代时间：
-
-3.18日晚17:30，代码已在github上部署完毕
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).

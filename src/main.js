@@ -3,6 +3,8 @@ import VueRouter from 'vue-router';
 import App from './App.vue'
 import router from './router';
 import 'ant-design-vue/dist/antd.css'; 
+import "mavon-editor/dist/css/index.css"
+import 'font-awesome/css/font-awesome.min.css'
 import "../reset.less"
 import { Button} from 'ant-design-vue';
 import { Card } from 'ant-design-vue';
@@ -34,8 +36,12 @@ import { Radio } from 'ant-design-vue';
 import {Table} from 'ant-design-vue';
 import {Tag} from 'ant-design-vue';
 import {Switch} from 'ant-design-vue';
+import { message} from 'ant-design-vue'
 import {Collapse} from 'ant-design-vue';
+import htmlToPdf from '@/utils/htmlToPdf'
+import {mavonEditor} from "mavon-editor";
 
+Vue.use(htmlToPdf)
 Vue.use(Button);
 Vue.use(Input);
 Vue.use(Layout);
@@ -69,10 +75,35 @@ Vue.use(Table);
 Vue.use(Tag);
 Vue.use(Switch);
 Vue.use(Collapse);
+Vue.use(mavonEditor);
 
+Vue.prototype.$confirm = Modal.confirm;
+Vue.prototype.$message = message;
+message.config({
+    duration: 2,// 持续时间
+    top:`100px`, // 到页面顶部距离
+    maxCount: 3 // 最大显示数, 超过限制时，最早的消息会被自动关闭
+});
+
+import Axios from 'axios'
 Vue.use(VueRouter);
 
 Vue.config.productionTip = false;
+
+Axios.interceptors.request.use(config => {  
+  if(config.push === '/'){
+    console.log(1)
+   } else { 
+      if (localStorage.getItem('token')) { 
+  //在请求头加入token，名字要和后端接收请求头的token名字一样    
+           config.headers.token=localStorage.getItem('token');        
+          }   
+        }  
+         return config;  
+   },  
+   error => { 
+      return Promise.reject(error);
+   });
 
 new Vue({
   

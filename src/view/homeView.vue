@@ -3,45 +3,44 @@
     <a-layout-sider
       :style="{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0 }"
     >
-      <div style="background:black" class="logo">
-        <img src="../assets/cabbage.png" height=40px/>
+      <div style="background:rgb(29, 130, 72)" class="logo">
+        <img src="../assets/cabbage.png" height="40px" />
         Cabbage
       </div>
       <a-menu
-        theme="dark"
+        style="background:rgb(29, 130, 72);color:white"
         mode="inline"
-        :default-selected-keys="['doc']"
         @select="menuClick"
       >
         <a-menu-item key="user">
           <a-icon type="user" />
-          <span>个人主页</span>
+          <span>PERSONAL PAGE</span>
         </a-menu-item>
         <a-menu-item key="doc">
           <a-icon type="file" />
-          <span>我的文档</span>
+          <span>MY DOCS</span>
         </a-menu-item>
         <a-menu-item key="bin">
           <a-icon type="delete" />
-          <span>回收站</span>
+          <span>BIN</span>
         </a-menu-item>
         <a-menu-item key="team">
           <a-icon type="team" />
-          <span>团队</span>
+          <span>MY TEAM</span>
         </a-menu-item>
         <a-menu-item key="help">
           <a-icon type="question" />
-          <span>帮助</span>
+          <span>HELP</span>
         </a-menu-item>
         <a-menu-item key="message">
           <a-icon type="bell" />
-          <span>消息</span>
+          <span>MESSAGE</span>
         </a-menu-item>
       </a-menu>
     </a-layout-sider>
     <a-layout :style="{ marginLeft: '200px' }">
       <!-- <a-layout-header :style="{ background: '#fff', padding: 0 }" /> -->
-      <a-layout-content :style="{ margin: '10px 8px 0', overflow: 'initial'}">
+      <a-layout-content :style="{ margin: '10px 8px 0', overflow: 'initial' }">
         <div
           :style="{
             padding: '24px',
@@ -59,7 +58,7 @@
     </a-layout>
   </a-layout>
 </template>
- 
+
 <script>
 export default {
   name: "HomeView",
@@ -74,13 +73,19 @@ export default {
           this.$router.push("/help");
           break;
         case "doc":
-          this.$router.push("/doc");
+          this.$router.push("/doc/" + localStorage.getItem("userid"));
+          break;
+        case "bin":
+          this.$router.push("/bin/" + localStorage.getItem("userid"));
           break;
         case "team":
-          this.$router.push("/team");
+          this.$router.push("/team/" + localStorage.getItem("userid"));
           break;
         case "user":
-          this.$router.push("/personal-page");
+          this.$router.push("/personal-page/" + localStorage.getItem("token"));
+          break;
+        case "message":
+          this.$router.push("/message/");
           break;
       }
     },
@@ -88,8 +93,7 @@ export default {
 };
 </script>
 
-
-<style>
+<style scoped>
 #components-layout-demo-fixed-sider .logo {
   height: 32px;
   background: rgba(255, 255, 255, 0.2);

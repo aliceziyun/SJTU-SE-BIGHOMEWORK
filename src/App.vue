@@ -1,16 +1,21 @@
 <template>
-  <a-layout>
+  <div id="app">
     <router-view></router-view>
-  </a-layout>
+  </div>
 </template>
 
-<style>
+<script>
+
+export default {
+  name:'app',
+}
+</script>
+
+<style scoped>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  height: 100%;
 }
 </style>

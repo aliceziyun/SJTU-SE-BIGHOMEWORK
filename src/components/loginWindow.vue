@@ -181,18 +181,18 @@ export default {
             .post("http://localhost:5000/api/regist/", formData, config)
             .then(function (response) {
               if (response.data.message == "success") {
-                _this.successmessage("注册成功");
+                _this.successmessage("succesful register");
                 setTimeout(() => {
                   myrefresh();
                 }, 2000);
               } else if (response.data.message == "fail") {
                 _this.errormessage("existed username & email!");
               } else {
-                _this.errormessage("未知错误，请稍后再试");
+                _this.errormessage("unknown error");
               }
             })
             .catch(function () {
-              _this.errormessage("未知错误，请稍后再试");
+              _this.errormessage("unknown error");
             });
         } else {
           return false;
@@ -224,7 +224,7 @@ export default {
           }
         })
         .catch(function () {
-          _this.errormessage("未知错误，请稍后再试");
+          _this.errormessage("unknown error");
         });
     },
     resetForm(formName) {

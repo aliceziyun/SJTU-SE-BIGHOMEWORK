@@ -6,9 +6,9 @@
         <a-affix :offset-top="top">
           <a-popover placement="topRight">
             <template slot="content">
-              <span style="font-size:20px">点击创建属于你的文档! QuQ</span>
+              <span style="font-size:20px">click here to create your DOC! :)</span>
             </template>
-            <a-button type="primary" icon="plus" size="large" block @click="shownewdocform"></a-button>
+            <a-button type="primary" icon="plus" size="small" block @click="shownewdocform"></a-button>
           </a-popover>
         </a-affix>
       </a-col>
@@ -20,13 +20,13 @@
       </a-list-item>
     </a-list>
     <div>
-      <a-modal title="创建文档" :visible="newdocvisible" @ok="createdoc" @cancel="cancelcreate">
+      <a-modal title="CREATE DOC" :visible="newdocvisible" @ok="createdoc" @cancel="cancelcreate">
         <template>
           <a-form-model :model="newdocform" :label-col="labelCol" :wrapper-col="wrapperCol">
-            <a-form-model-item label="文档标题">
+            <a-form-model-item label="TITLE">
               <a-input v-model="newdocform.title" />
             </a-form-model-item>
-            <a-form-model-item label="协作者权限">
+            <a-form-model-item label="RIGHTS">
               <div>
                 <div :style="{ borderBottom: '1px solid #E9E9E9' }">
                   <a-checkbox
@@ -38,14 +38,14 @@
                 <a-checkbox-group v-model="checkedList" :options="plainOptions" @change="onChange" />
               </div>
             </a-form-model-item>
-            <a-form-model-item label="模版选择">
+            <a-form-model-item label="TEMPLATE">
               <div>
                 <a-radio-group v-model="templateValue" @change="onChangeTem">
-                  <a-radio :value="1">空白文档
+                  <a-radio :value="1">empty doc
                   </a-radio>
-                  <a-radio :value="2">模版 1
+                  <a-radio :value="2">template 1
                   </a-radio>
-                  <a-radio :value="3">模版 2
+                  <a-radio :value="3">template 2
                   </a-radio>
                   
                 </a-radio-group>
@@ -60,26 +60,12 @@
 <script type="text/ecmascript-6">
 import axios from "axios";
 import docCard from '../components/docCard.vue'
-const data = [
-  //   {
-  //     id:'',//文档id
-  //     title: '',//标题名字
-  //     description:'',//简介
-  //     created_time:'',//创建时间
-  //     modify_right:'',//是否有修改权限,针对协作者，创建者拥有全部权限 1:yes 0:no
-  //     share_right:'',//是否有分享权限，同上 1:yes 0:no
-  //     discuss_right:'',//是否有评论权限，同上 1:yes 0:no
-  //     recycled:'',//是否放入了回收站 0:not 1:yes
-  //     is_occupied:'',//是否有人在使用文档，这时候文档上锁，不可读不可写 0: Not occupied, 1: Occupied
-  //     group_id:'',//团队id，如果是0那么该文档是个人文档
-  //     modified_time:'',//上次修改时间，任意一个人修改都会改变上次修改时间
-  //   },
-];
+const data = [];
 function myrefresh() {
   window.location.reload();
 }
-const plainOptions = ['修改', '评论', '分享'];
-const defaultCheckedList = ['修改', '评论'];
+const plainOptions = ['edit', 'comment', 'share'];
+const defaultCheckedList = ['edit', 'comment'];
 export default {
   components: {
     docCard,
@@ -165,12 +151,12 @@ export default {
     
     createdoc(){
       this.checkedList.forEach(element => {
-        if(element=="修改")this.newdocform.modify_right=1;
-        if(element=="评论")this.newdocform.discuss_right=1;
-        if(element=="分享")this.newdocform.share_right=1;
+        if(element=="edit")this.newdocform.modify_right=1;
+        if(element=="comment")this.newdocform.discuss_right=1;
+        if(element=="share")this.newdocform.share_right=1;
       });
       if (this.newdocform.title == ""){
-              this.errormsg("标题为空");
+              this.errormsg("empty title!");
               return;
             }
       switch(this.templateValue){
@@ -208,18 +194,17 @@ export default {
       axios.post("http://localhost:5000/api/create_personal_doc/", formData, config)
         .then(function (response) {
           if (response.data.message == "success") {
-            _this.successmsg("创建成功");
+            _this.successmsg("successful create");
             setTimeout(() => {
               myrefresh();
             }, 2000);
           } 
           else {
-            _this.errormsg("创建失败，请尝试刷新后再次创建1");
+            _this.errormsg("create fail,please try again later");
           }
         })
-        .catch(function (error) {
-          console.log(error)
-          _this.errormsg("创建失败，请尝试刷新后再次创建2");
+        .catch(function () {
+          _this.errormsg("create fail,please try again later");
         });
     },
   },
@@ -233,20 +218,14 @@ export default {
       },
     };
     axios
-      .post("http://localhost:5000/api/my_created_docs/", formData, config)
+      .post("http://localhost:5000/api/my_docs/", formData, config)
       .then(function (response) {
         if (response) {
           _this.data = response.data;
-          console.log(response.data);
         } else {
-          alert("请先登录！");
+          alert("please login first!");
         }
       })
-      .catch(function (error) {
-        console.log("wrong", error);
-      });
   },
 };
 </script>
-<style>
-</style>

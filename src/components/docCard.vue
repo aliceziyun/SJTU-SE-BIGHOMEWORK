@@ -4,63 +4,63 @@
       <img
         slot="cover"
         alt="example"
-        src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+        :src="imgsrc"
         @click="toDocs(docObj.id)"
       />
       <template slot="actions">
         <a-tooltip placement="bottom" v-if="fav == 0">
           <template slot="title">
-            <span>移到回收站</span>
+            <span>move to bin</span>
           </template>
           <a-icon type="delete" @click="confirmDelete(1)" />
         </a-tooltip>
         <a-tooltip placement="bottom" v-if="fav == 0">
           <template slot="title">
-            <span>修改标题</span>
+            <span>edit title</span>
           </template>
           <a-icon type="edit" @click="showModal()" />
         </a-tooltip>
         <a-tooltip placement="bottom" v-if="fav == 0">
           <template slot="title">
-            <span>分享文档</span>
+            <span>share doc</span>
           </template>
           <a-icon type="share-alt" @click="shareDocForm()" />
         </a-tooltip>
 
         <a-tooltip placement="bottom" v-if="fav == 1">
           <template slot="title">
-            <span>移到回收站</span>
+            <span>move to bin</span>
           </template>
           <a-icon type="delete" @click="confirmDelete(1)" />
         </a-tooltip>
         <a-tooltip placement="bottom" v-if="fav == 1">
           <template slot="title">
-            <span>修改标题</span>
+            <span>edit title</span>
           </template>
           <a-icon type="edit" @click="showModal()" />
         </a-tooltip>
         <a-tooltip placement="bottom" v-if="fav == 1">
           <template slot="title">
-            <span>取消收藏</span>
+            <span>?</span>
           </template>
           <a-icon type="share-alt" @click="shareDocForm()" />
         </a-tooltip>
 
         <a-tooltip placement="bottom" v-if="fav == 2">
           <template slot="title">
-            <span>移到回收站</span>
+            <span>move to bin</span>
           </template>
           <a-icon type="delete" @click="confirmDelete(1)" />
         </a-tooltip>
         <a-tooltip placement="bottom" v-if="fav == 2">
           <template slot="title">
-            <span>修改标题</span>
+            <span>edit title</span>
           </template>
           <a-icon type="edit" @click="showModal()" />
         </a-tooltip>
         <a-tooltip placement="bottom" v-if="fav == 2">
           <template slot="title">
-            <span>收藏文档</span>
+            <span>share doc</span>
           </template>
           <a-icon type="share-alt" @click="shareDocForm()" v-if="fav == 2" />
         </a-tooltip>
@@ -86,7 +86,7 @@
 
         <a-tooltip placement="bottom" v-if="fav == 4">
           <template slot="title">
-            <span>恢复文档</span>
+            <span>restore doc</span>
           </template>
           <a-icon
             type="unlock"
@@ -96,7 +96,7 @@
         </a-tooltip>
         <a-tooltip placement="bottom" v-if="fav == 4">
           <template slot="title">
-            <span>彻底删除文档</span>
+            <span>delete file permanently</span>
           </template>
           <a-icon type="delete" @click="confirmDelete(2)" v-if="fav == 4" />
         </a-tooltip>
@@ -108,26 +108,26 @@
         <a-icon type="file-add" @click="addFavorDocs()" v-if="fav==0" />
         <a-icon type="minus-square" @click="delFavorDocs()" v-if="fav==1" />-->
       </template>
-      <span> 创建者: {{ this.username }}</span>
+      <span> owner:{{ this.username }}</span>
       <br /><br />
       <span>
-        创建日期 : {{ moment(docObj.created_time).format("YYYY-MM-DD") }}</span
+        date:{{ moment(docObj.created_time).format("YYYY-MM-DD") }}</span
       >
     </a-card>
 
     <a-modal
-      title="分享文档"
+      title="SHARE DOC"
       :visible="sharevisible"
-      @ok="shareDoc"
+      @ok="shareDoc(shareEmail,docObj.id)"
       @cancel="cancelshare"
     >
     <template>
-        <member-list></member-list>
+        <a-input v-model="shareEmail" placeholder="Please input the email of the user and we will send invitation" />
     </template>
     </a-modal>
 
     <a-modal
-      title="修改文档信息"
+      title="EDIT DOC TITLE"
       :visible="visible"
       @ok="handleOk"
       @cancel="handleCancel"
@@ -138,7 +138,7 @@
           :label-col="labelCol"
           :wrapper-col="wrapperCol"
         >
-          <a-form-model-item label="文档标题">
+          <a-form-model-item label="Doc Title">
             <a-input v-model="form.title" />
           </a-form-model-item>
         </a-form-model>
@@ -150,7 +150,6 @@
 <script>
 import axios from "axios";
 import moment from "moment";
-import MemberList from "./memberList.vue"
 
 function myrefresh() {
   window.location.reload();
@@ -163,6 +162,7 @@ export default {
       id: { type: Number, dafault: 0 },
       title: { type: String, default: "" },
       created_time: { type: String, default: "" },
+      creator_id: {type: Number, default: 0},
     },
     fav: {
       type: Number,
@@ -184,12 +184,10 @@ export default {
       group_id: "",
       moment,
       username: "",
+      shareEmail:"",
       sharevisible: false,
+      imgsrc:"",
     };
-  },
-
-  components: {
-    MemberList,
   },
 
   watch: {
@@ -214,11 +212,11 @@ export default {
             if (response) {
               _this.username = response.data.username;
             } else {
-              _this.errormsg("恢复失败，请稍后重试");
+              _this.errormsg("retore fail,please try again later");
             }
           })
           .catch(function () {
-            _this.errormsg("恢复失败，请稍后重试");
+            _this.errormsg("retore fail,please try again later");
           });
       },
       deep: true,
@@ -232,7 +230,15 @@ export default {
       immediate: true,
     },
   },
-  mounted: function () {},
+  mounted: function () {
+    if(this.docObj.creator_id==localStorage.getItem("userid")){
+      this.imgsrc = require("../assets/cabbage3.jpg")
+    }
+    else{
+      this.imgsrc = require("../assets/cabbage5.png")
+    }
+    console.log(this.imgsrc)
+  },
 
   methods: {
     successmsg(message) {
@@ -252,7 +258,7 @@ export default {
       this.sharevisible = false;
     },
     deleteDocs(flag, self) {
-      console.log("删除该项" + self.form.DocumentID);
+      console.log("delete" + self.form.DocumentID);
       let formData = new FormData();
       formData.append("DocumentID", self.form.DocumentID);
       formData.append("username", localStorage.getItem("token"));
@@ -267,16 +273,16 @@ export default {
           .then(function (response) {
             console.log(response.data.message);
             if (response.data.message == "success") {
-              self.successmsg("删除成功");
+              self.successmsg("successful delete");
               setTimeout(() => {
                 myrefresh();
               }, 2000);
             } else {
-              self.errormsg("删除失败，请尝试刷新后重试");
+              self.errormsg("delete fail,please try again later");
             }
           })
           .catch(function () {
-            self.errormsg("删除失败，请尝试刷新后重试");
+            self.errormsg("delete fail,please try again later");
           });
       } else {
         axios
@@ -284,41 +290,41 @@ export default {
           .then(function (response) {
             console.log(response.data.message);
             if (response.data.message == "success") {
-              self.successmsg("彻底删除成功");
+              self.successmsg("permanently delete");
               setTimeout(() => {
                 myrefresh();
               }, 2000);
             } else {
-              self.errormsg("彻底删除失败，请尝试刷新后重试");
+              self.errormsg("delete fail,please try again later");
             }
           })
           .catch(function () {
-            self.errormsg("彻底删除失败，请尝试刷新后重试");
+            self.errormsg("delete fail,please try again later");
           });
       }
     },
 
     confirmDelete(x) {
       var _this = this;
-      console.log("文档创建者id" + this.form.creator_id);
-      console.log("登录id " + localStorage.getItem("userid"));
+      // console.log("文档创建者id" + this.form.creator_id);
+      // console.log("登录id " + localStorage.getItem("userid"));
       if (this.form.creator_id != localStorage.getItem("userid")) {
-        this.errormsg("您没有权限");
+        this.errormsg("you don't have the right to delete");
         return;
       }
       this.$confirm({
-        title: <div style="font-weight:bold">确认删除？</div>,
+        title: <div style="font-weight:bold">CONFIRM DELETE?</div>,
         content:
           x == 1 ? (
-            <div style="color:red;">文件将被移入回收站</div>
+            <div style="color:red;">the doc will be moved to bin.</div>
           ) : (
             <div style="color:red;">
-              文件将<span style="font-weight:bold"> 永 远 消 失 ！</span>
+              the doc will be<span style="font-weight:bold"> PERMANENTLY DELETED!</span>
             </div>
           ),
-        okText: "删除",
+        okText: "Delete",
         okType: "danger",
-        cancelText: "取消",
+        cancelText: "cancel",
         onOk() {
           console.log("OK");
           _this.$options.methods.deleteDocs(x, _this);
@@ -401,30 +407,57 @@ export default {
         .post("http://localhost:5000/api/recover_doc/", formData, config)
         .then(function (response) {
           if (response.data.message == "success") {
-            _this.successmsg("恢复成功");
+            _this.successmsg("successful restore");
             setTimeout(() => {
               myrefresh();
             }, 2000);
           } else {
-            _this.errormsg("恢复失败，请稍后重试");
+            _this.errormsg("restore fail,please try later");
           }
         })
         .catch(function () {
-          _this.errormsg("恢复失败，请稍后重试");
+          _this.errormsg("restore fail,please try later");
         });
     },
     showModal() {
       if (this.form.creator_id != localStorage.getItem("userid")) {
-        this.errormsg("您没有权限");
+        this.errormsg("you don't have the right");
         return;
       }
       this.form.title = this.docObj.title;
       this.form.DocumentID = this.docObj.id;
       this.visible = true;
     },
+    shareDoc(email,id){
+      var _this = this;
+      let formData = new FormData();
+      formData.append("DocumentID", id);
+      formData.append("username", localStorage.getItem("token"));
+      formData.append("Email", email);
+      let config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      axios
+        .post("http://localhost:5000/api/pernal_doc_share_to/", formData, config)
+        .then(function (response) {
+          if (response.data.message == "success") {
+            _this.successmsg("successful share");
+            setTimeout(() => {
+              myrefresh();
+            }, 2000);
+          } else {
+            _this.errormsg("share doc fail!");
+          }
+        })
+        .catch(function () {
+          _this.errormsg("share fail,please try later!");
+        });
+    },
     handleOk() {
       if (this.form.creator_id != localStorage.getItem("userid")) {
-        this.errormsg("你不是创建者，不能修改");
+        this.errormsg("you're not the owner,can't modify the doc!");
         return;
       }
       var _this = this;
@@ -441,16 +474,16 @@ export default {
         .post("http://localhost:5000/api/modify_doc_basic/", formData, config)
         .then(function (response) {
           if (response.data.message == "success") {
-            _this.successmsg("修改成功！");
+            _this.successmsg("successful modify");
             setTimeout(() => {
               myrefresh();
             }, 2000);
           } else {
-            _this.errormsg("修改失败，您不是文档的创建者！");
+            _this.errormsg("modify fail,you're not the doc owner!");
           }
         })
         .catch(function () {
-          _this.errormsg("修改失败，请尝试刷新后再次修改！");
+          _this.errormsg("modify fail,please try later");
         });
     },
     handleCancel() {

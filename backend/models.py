@@ -1,8 +1,8 @@
-from functools import wraps
 from flask import Flask, flash
-
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, or_,not_
+from functools import wraps
+import time
 import config
 app = Flask(__name__)
 app.config.from_object(config)
@@ -12,9 +12,9 @@ db = SQLAlchemy(app)
 class User(db.Model):
     __tablename__='User'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(255), unique=True)
-    password = db.Column(db.String(255))
     email = db.Column(db.String(255), unique=True)
+    username = db.Column(db.String(255), unique=True)
+    password = db.Column(db.String(255), unique=True)
     description=db.Column(db.TEXT)
 
     def __repr__(self):
@@ -23,8 +23,8 @@ class User(db.Model):
 class Group(db.Model):
     __tablename__='Group'
     id=db.Column(db.Integer,primary_key=True)
-    groupname=db.Column(db.String(255))
     leaderid=db.Column(db.Integer)
+    groupname=db.Column(db.String(255),unique=True)
     createdtime=db.Column(db.DateTime)
     description=db.Column(db.String(255))
     
@@ -34,7 +34,7 @@ class Group(db.Model):
 class GroupMember(db.Model):
     __tablename__='GroupMember'
     id=db.Column(db.Integer,primary_key=True)
-    group_id=db.Column(db.Integer)
+    group_id=db.Column(db.Integer,unique=True)
     user_id=db.Column(db.Integer)
 
     def __repr__(self):
@@ -43,25 +43,22 @@ class GroupMember(db.Model):
 class Document(db.Model):
     __tablename__='Document'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(255), unique=True)
+    title = db.Column(db.String(255),unique=True)
     creator_id=db.Column(db.Integer)
     created_time=db.Column(db.DateTime)
-    #created_time=db.Column(db.Integer)
     modified_time=db.Column(db.DateTime)
-    #modified_time=db.Column(db.Integer)
     content=db.Column(db.TEXT)
 
     modify_right=db.Column(db.Integer)
     share_right=db.Column(db.Integer)
     discuss_right=db.Column(db.Integer)
-    
     others_modify_right=db.Column(db.Integer)
     others_share_right=db.Column(db.Integer)
     others_discuss_right=db.Column(db.Integer)   
     
     recycled=db.Column(db.Integer)
-    is_occupied=db.Column(db.Integer) # 0: Not occupied, 1: Occupied
-    group_id=db.Column(db.Integer) # 0: Personal document, not 0: Group document
+    is_occupied=db.Column(db.Integer)
+    group_id=db.Column(db.Integer
     def __repr__(self):
         return "<Document %r>" % self.title
 
@@ -72,19 +69,29 @@ class DocumentUser(db.Model):
     document_id=db.Column(db.Integer)
     user_id=db.Column(db.Integer)
     is_creator=db.Column(db.Boolean)
+    
     share_right=db.Column(db.Integer)
     watch_right=db.Column(db.Integer)
     modify_right=db.Column(db.Integer)
     delete_right=db.Column(db.Integer)
     discuss_right=db.Column(db.Integer)
     last_watch=db.Column(db.DateTime)
+    
     favorited=db.Column(db.Integer)
     modified_time=db.Column(db.DateTime)
-    # recycled=db.Column(db.Integer)
-    type=db.Column(db.Integer) # 0: personal 1: group 2: 被分享的团队文档
+    type=db.Column(db.Integer)
 
     def __repr__(self):
-        return "<DocumentUser %r>" % self.document_user_id
+        return "<DocumentUser %r>" % self.document_id
+
+class GroupDocument(db.Model):
+    __tablename__='GroupDocument'
+    id=db.Column(db.Integer, primary_key=True)
+    group_id=db.Column(db.Integer)
+    document_id=db.Column(db.Integer)
+
+    def __repr__(self):
+        return "<GroupDocument %r>" %self.id
 
 class Comment(db.Model):
     __tablename__='Comment'
@@ -105,17 +112,6 @@ class Notice(db.Model):
     content=db.Column(db.TEXT)
     type=db.Column(db.Integer)
     
-# type:
-# 0:我被踢出团队 传content、group_id "a将你踢出了团队xxx"
-# 1:我被邀请加入某个团队，我选择接受加入团队 传group_id、content 发送给sender "a通过了你的邀请"
-# 2:我邀请他人加入某个团队，对方通过/拒绝 传group_id、content 发送给receiver "a邀请你加入团队xxx"
-# 3:我创建的文档被评论 评论者传给创建者 document_id、content 发送 "你的文档xxx被a评论"
-# 4:收到了来自他人分享来的文件，传document_id、content 由sender发送 "你收到了来自a分享的文档xxx"
-# 5:我被邀请加入某个团队，我选择拒绝加入团队 传group_id、content 发送给sender "a拒绝了你的邀请"
-# 6:我主动申请加入某个团队(先模糊检索团队名)，传group_id、content，发给团队leader "a申请加入团队xxx"
-# 7:团队leader接受了对方的加入团队申请，传给申请人group_id、content 发送给申请人 "团队xxx接受了你的邀请"
-# 8:团队leader拒绝了对方的加入团队申请，传给申请人group_id、content 发送给申请人 "团队xxx拒绝了你的邀请"
-# 9:用户主动退出某一个团队，向团队管理者发送消息
 
 class Message(db.Model):
     __tablename__='Message'

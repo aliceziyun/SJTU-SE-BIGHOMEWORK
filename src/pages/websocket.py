@@ -2,7 +2,7 @@ from flask import Flask, request
 import json
 from geventwebsocket.handler import WebSocketHandler
 from gevent.pywsgi import WSGIServer
-from geventwebsocket.websocket import WebSocket
+from geventwebsocket.websocket import WebSocket   #这条做语法提示用
 
 app = Flask(__name__)
 
@@ -18,17 +18,15 @@ def index():
         if message:
             obj=json.loads(message)
             username=obj['username']
-            print(username)
             content=obj['content']
-            print(content)
             res="{\"username\":\""+username+"\",\"content\":\""+content+"\"}"
-            for user in list(users):
+            for user in users:
                 if user!=wsock:
                     try:
-                        # print(res)
+                        print(res)
                         user.send(res)
                     except:
-                        print("disconnect") 
+                        print("用户断开连接") 
                         users.remove(wsock)
 
 
@@ -38,6 +36,8 @@ def hello():
     return "hello"
 
 if __name__ == '__main__':
+    #在APP外封装websocket
     http_serv = WSGIServer(("0.0.0.0",8888),app,handler_class=WebSocketHandler)
+    # 启动服务
     http_serv.serve_forever()
 

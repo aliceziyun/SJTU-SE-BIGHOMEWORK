@@ -3,8 +3,8 @@
     <div style="background: white">
       <a-col :span="2">
         <a-input-search
-          placeholder="查询团队"
-          style="width: 300px; margin-left: 20px; margin-top: 20px"
+          placeholder="search team"
+          style="width: 300px; margin-left: 650px; margin-top: 20px"
         />
       </a-col>
 
@@ -13,15 +13,15 @@
         <a-affix :offset-top="top">
           <a-popover placement="topRight">
             <template slot="content">
-              <span style="font-size: 10px">点击创建一个属于你的团队! QvQ</span>
+              <span style="font-size: 20px">click here to create your GROUP!</span>
             </template>
             <a-button
               type="primary"
               icon="plus"
-              size="large"
+              size="small"
               block
               @click="shownewteamform"
-              style="margin-top: 10px"
+              style="margin-top: 22px"
             ></a-button>
           </a-popover>
         </a-affix>
@@ -39,7 +39,7 @@
         </div>
       </a-card>
       <a-modal
-        title="创建团队"
+        title="CREATE GROUP"
         :visible="newteamvisible"
         @ok="createteam"
         @cancel="cancelcreate"
@@ -50,10 +50,10 @@
             :label-col="labelCol"
             :wrapper-col="wrapperCol"
           >
-            <a-form-model-item label="团队队名">
+            <a-form-model-item label="groupname">
               <a-input v-model="newteamform.groupname" />
             </a-form-model-item>
-            <a-form-model-item label="团队简介">
+            <a-form-model-item label="description">
               <a-input v-model="newteamform.description" />
             </a-form-model-item>
           </a-form-model>
@@ -107,12 +107,6 @@ export default {
       this.newteamvisible = true;
     },
     createteam() {
-      // this.checkedList.forEach(element => {
-      //   if(element=="修改")this.newteamform.modify_right=1;
-      //   if(element=="评论")this.newteamform.discuss_right=1;
-      //   if(element=="分享")this.newteamform.share_right=1;
-      // });
-
       this.newteam();
     },
     newteam() {
@@ -120,9 +114,6 @@ export default {
       let formData = new FormData();
       formData.append("username", localStorage.getItem("token"));
       formData.append("groupname", this.newteamform.groupname);
-      // formData.append("modify_right", this.newdocform.modify_right);
-      // formData.append("share_right", this.newdocform.share_right);
-      // formData.append("discuss_right", this.newdocform.discuss_right);
       formData.append("description", this.newteamform.description);
       let config = {
         headers: {
@@ -134,16 +125,16 @@ export default {
         .post("http://localhost:5000/api/creategroup/", formData, config)
         .then(function (response) {
           if (response.data.message == "success") {
-            _this.successmsg("创建成功");
+            _this.successmsg("successful create");
             setTimeout(() => {
               myrefresh();
             }, 2000);
           } else {
-            _this.errormsg("创建失败，请尝试刷新后再次创建");
+            _this.errormsg("create fail,please try again later");
           }
         })
         .catch(function () {
-          _this.errormsg("创建失败，请尝试刷新后再次创建");
+          _this.errormsg("create fail,please try again later");
         });
     },
   },
@@ -157,18 +148,14 @@ export default {
             }
         };
     axios
-      .post("http://localhost:5000/api/group_created_byme/", formData, config)
+      .post("http://localhost:5000/api/mygroup/", formData, config)
       .then(function (response) {
         if (response) {
           _this.data = response.data;
-          console.log(response.data);
         } else {
-          alert("请先登录！");
+          alert("please login first!");
         }
       })
-      .catch(function (error) {
-        console.log("wrong", error);
-      });
   },
 };
 </script>

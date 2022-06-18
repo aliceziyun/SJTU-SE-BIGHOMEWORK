@@ -1,7 +1,6 @@
 <template>
 <div>
   <a-col align='center'>
-  <p v-if="hasMember">无可分享对象</p>
   <span v-for="(user,index) in memberList" :key="index">
     <memberAvatar :username="user.username"></memberAvatar>
   </span>

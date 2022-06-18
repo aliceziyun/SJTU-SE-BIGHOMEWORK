@@ -1,6 +1,6 @@
 <template>
-  <div  v-title data-title="请处理您的邀请信息">
-    <a-table :columns="columns" :data-source="data" style="margin-right:170px;margin-top:30px" rowKey="id">
+  <div class="message-box">
+    <a-table :columns="columns" :data-source="data" style="margin-right:200px;margin-top:30px" rowKey="id">
       <span slot="action" slot-scope="text,item">
         <a-button type="primary" size="large"  @click="agree_invitation(item.id)">
             <a-icon type="check"/>
@@ -14,39 +14,37 @@
     </a-table>
   </div>
 </template>
+
+<style scoped>
+.message-box{
+  width:1000px;
+  margin-left: 200px;
+}
+</style>
+
 <script type="text/ecmascript-6">
-// import { mavonEditor } from "mavon-editor";
-// import memberAvatar from '../team/memberAvatar';
-import "mavon-editor/dist/css/index.css";
 import axios from "axios";
-// import moment from "moment";
-import "@/utils/htmlToPdf.js"
-// import docxtemplater from 'docxtemplater'
-// import PizZip from 'pizzip'
-// import JSZipUtils from 'jszip-utils'
-// import {saveAs} from 'file-saver'
 const columns = [
   {
-    title:"邀请团队",
+    title:"GROUPNAME",
     dataIndex: "group_name",
     key: "group_name",
     width: 150,
   },
   {
-    title: "邀请者",
+    title: "SENDER",
     dataIndex: "sender_name",
     key: "sender_name",
     width: 150,
   },
   {
-    title: "邀请时间",
+    title: "DATETIME",
     dataIndex: "datetime",
     key: "datetime",
-    ellipsis: false,
     width: 200,
   },
   {
-    title: "Action",
+    title: "ACTION",
     key:"action",
     scopedSlots: { customRender: "action" },
     width: 300,
@@ -77,7 +75,7 @@ export default {
       };
       var _this = this;
       axios
-        .post("http://localhost:5000/api/view_confirm_notice/", formData, config)
+        .post("http://192.168.1.111:5000/api/view_confirm_notice/", formData, config)
         .then(function (response) {
             _this.data=response.data;
         })
@@ -89,8 +87,6 @@ export default {
     agree_invitation(id){
       var _this=this
       var item=this.data.find(item => item.id==id);
-      console.log(item.id+":要接受的noticeid");
-      console.log(item);
       let formData = new FormData();
       formData.append("id",item.id);
       formData.append("userid", item.receiver_id);
@@ -101,7 +97,7 @@ export default {
         },
       };
       axios
-        .post("http://localhost:5000/api/addgroupmember/", formData, config)
+        .post("http://192.168.1.111:5000/api/addgroupmember/", formData, config)
         .then(function () {
              _this.data=_this.data.filter((record)=>record.id!=item.id)
              _this.$emit('updatenotice');
@@ -114,7 +110,6 @@ export default {
     refuse_invitation(id){
       var item=this.data.find(item => item.id==id);
       var _this=this;
-      console.log(item.id+":要拒绝的noticeid");
       let formData = new FormData();
       formData.append("id",item.id);
       formData.append("userid", item.receiver_id);
@@ -126,7 +121,7 @@ export default {
       };
       
       axios
-        .post("http://localhost:5000/api/refuse_groupmember/", formData, config)
+        .post("http://192.168.1.111:5000/api/refuse_groupmember/", formData, config)
         .then(function () {
             _this.data=_this.data.filter((record)=>record.id!=item.id)
             _this.$emit('updatenotice');

@@ -1,13 +1,30 @@
 <template>
   <div id="userpage">
+    <a-modal
+      title="Send message to user"
+      :visible="messagebox"
+      @ok="SendMessage(userObj.username)"
+      @cancel="cancelMessage"
+    >
+      <template>
+        <a-input
+          v-model="my_message"
+          placeholder="Please type your message"
+        />
+      </template>
+    </a-modal>
+
     <section class="newsletter">
       <div class="backarrow">
         <a @click="Back()"><i class="fa fa-arrow-left"></i></a>
       </div>
       <div class="header">
-        <img src="@/assets/icon.png" alt="" />
+        <img src="@/assets/header.png" alt="" />
         <h3>{{ userObj.username }}</h3>
         <p>This is a brief introduction.</p>
+        <a href="#" @click="Message()">
+          <i class="fa fa-envelope" style="color: white"></i>
+        </a>
       </div>
       <div class="numbers">
         <div class="num">
@@ -124,6 +141,8 @@ export default {
     return {
       loading: false,
       disabled: false,
+      messagebox: false,
+      my_message:"",
 
       userObj: {
         username: "",
@@ -134,18 +153,57 @@ export default {
     };
   },
   methods: {
+    successmsg(message) {
+      this.$message.success(message);
+    },
+    errormsg(message) {
+      this.$message.error(message);
+    },
     Logout() {
       this.$router.push("/");
     },
-    Back(){
+    Back() {
       this.$router.push("/home");
-    }
+    },
+    Message() {
+      this.messagebox = true;
+    },
+    cancelMessage() {
+      this.messagebox = false;
+    },
+    SendMessage(name) {
+      var _this = this;
+      let formData = new FormData();
+      formData.append("receiver", name);
+      formData.append("sender", localStorage.getItem("token"));
+      formData.append("message", this.my_message);
+      let config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      axios
+        .post("http://localhost:5000/api/message_user/", formData, config)
+        .then(function (response) {
+          if (response.data.message == "success") {
+            _this.successmsg("successful message");
+            setTimeout(() => {
+                _this.messagebox=false;
+              }, 500);
+          } 
+          else {
+            _this.errormsg("message fail!");
+          }
+        })
+        .catch(function () {
+          _this.errormsg("message fail,please try later!");
+        });
+    },
   },
 
   mounted() {
     let formData = new FormData();
     formData.append("username", this.$route.params.username);
-    console.log(this.$route.params.username);
     let config = {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -159,20 +217,13 @@ export default {
           _this.userObj = response.data;
         }
       })
-      .catch((error) => {
-        console.log("error", error);
-      });
     axios
       .post("http://localhost:5000/api/my_docs/", formData, config)
       .then(function (response) {
         if (response) {
           _this.mydocs = response.data.length;
-          console.log(response.data.length);
         }
       })
-      .catch((error) => {
-        console.log("error", error);
-      });
   },
 };
 </script>
@@ -207,21 +258,21 @@ export default {
   background-color: rgba(0, 0, 0, 0.25);
 }
 
-.newsletter .backarrow{
-    height: 2.8rem;
-    width: 2.8rem;
-    text-align: left;
-    margin-left: 1.4rem;
+.newsletter .backarrow {
+  height: 2.8rem;
+  width: 2.8rem;
+  text-align: left;
+  margin-left: 1.4rem;
 }
 
-.newsletter .backarrow a i{
-    color:#fff;
-    font-size: 1.4rem;
-    margin-top: 1.4rem;
+.newsletter .backarrow a i {
+  color: #fff;
+  font-size: 1.4rem;
+  margin-top: 1.4rem;
 }
 
-.newsletter .backarrow a i:hover{
-    color: #27ae60;
+.newsletter .backarrow a i:hover {
+  color: #27ae60;
 }
 
 .newsletter .header {

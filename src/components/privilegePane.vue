@@ -1,72 +1,72 @@
 <template>
 	<div>
 		<div v-show="this.rightObj.doctype!=1">
-			<a-divider>团队成员权限</a-divider>
+			<a-divider>group-member rights</a-divider>
 			<a-row>
-				<a-col span="6" align="left">修改文档</a-col>
+				<a-col span="6" align="left">edit</a-col>
 				<a-col span="18" align="right">
 					<a-radio-group name="modify_right" v-model="rightObj.modify_right" :disabled="!rightObj.isleader">
-						<a-radio :value="true">有</a-radio>
-						<a-radio :value="false">无</a-radio>
+						<a-radio :value="true">yes</a-radio>
+						<a-radio :value="false">no</a-radio>
 					</a-radio-group>
 				</a-col>
 			</a-row>
 			<a-row>
-				<a-col span="6" align="left">分享文档</a-col>
+				<a-col span="6" align="left">share</a-col>
 				<a-col span="18" align="right">
 					<a-radio-group name="modify_right" v-model="rightObj.share_right" :disabled="!rightObj.isleader">
-						<a-radio :value="true">有</a-radio>
-						<a-radio :value="false">无</a-radio>
+						<a-radio :value="true">yes</a-radio>
+						<a-radio :value="false">no</a-radio>
 					</a-radio-group>
 				</a-col>
 			</a-row>
 			<a-row>
-				<a-col span="6" align="left">参与讨论</a-col>
+				<a-col span="6" align="left">comment</a-col>
 				<a-col span="18" align="right">
 					<a-radio-group name="modify_right" v-model="rightObj.discuss_right" :disabled="!rightObj.isleader">
-						<a-radio :value="true">有</a-radio>
-						<a-radio :value="false">无</a-radio>
+						<a-radio :value="true">yes</a-radio>
+						<a-radio :value="false">no</a-radio>
 					</a-radio-group>
 				</a-col>
 			</a-row>
 		</div>
 
 		<div>
-		<a-divider>{{this.rightObj.doctype==1?'协作者权限':'非团队成员权限'}}</a-divider>
+		<a-divider>{{this.rightObj.doctype==1?"MEMEBER'S RIGHT":"non-member's right"}}</a-divider>
 		<a-row>
-			<a-col span="6" align="left">修改文档</a-col>
+			<a-col span="6" align="left">edit</a-col>
 			<a-col span="18" align="right">
 				<a-radio-group name="modify_right" v-model="rightObj.others_modify_right" :disabled="!rightObj.isleader">
-					<a-radio :value="true">有</a-radio>
-					<a-radio :value="false">无</a-radio>
+					<a-radio :value="true">yes</a-radio>
+					<a-radio :value="false">no</a-radio>
 				</a-radio-group>
 			</a-col>
 		</a-row>
 		<a-row>
-			<a-col span="6" align="left">分享文档</a-col>
+			<a-col span="6" align="left">share</a-col>
 			<a-col span="18" align="right">
 				<a-radio-group name="modify_right" v-model="rightObj.others_share_right" :disabled="!rightObj.isleader">
-					<a-radio :value="true">有</a-radio>
-					<a-radio :value="false">无</a-radio>
+					<a-radio :value="true">yes</a-radio>
+					<a-radio :value="false">no</a-radio>
 				</a-radio-group>
 			</a-col>
 		</a-row>
 		<a-row>
-			<a-col span="6" align="left">参与讨论</a-col>
+			<a-col span="6" align="left">comment</a-col>
 			<a-col span="18" align="right">
 				<a-radio-group name="modify_right" v-model="rightObj.others_discuss_right" :disabled="!rightObj.isleader">
-					<a-radio :value="true">有</a-radio>
-					<a-radio :value="false">无</a-radio>
+					<a-radio :value="true">yes</a-radio>
+					<a-radio :value="false">no</a-radio>
 				</a-radio-group>
 			</a-col>
 		</a-row>
 		</div>
 
 		<a-divider></a-divider>
-		<a-button type="default" style="float:left;margin-left:10%;margin-bottom:20px" @click="load_right(propRightObj)" :disabled="!rightObj.isleader">重置</a-button>
-		<a-button type="primary" style="float:right;margin-right:10%;margin-bottom:20px" @click="commit()" :disabled="!rightObj.isleader">提交</a-button>
+		<a-button type="default" style="float:left;margin-left:10%;margin-bottom:20px" @click="load_right(propRightObj)" :disabled="!rightObj.isleader">reset</a-button>
+		<a-button type="primary" style="float:right;margin-right:10%;margin-bottom:20px" @click="commit()" :disabled="!rightObj.isleader">submit</a-button>
 		<a-divider/>
-		<span><a-button type="danger" block :disabled="!rightObj.isleader" @click="personalize()">一键私密</a-button></span>
+		<span><a-button type="danger" block :disabled="!rightObj.isleader" @click="personalize()">personalize</a-button></span>
 	</div>
 </template>
 
@@ -141,12 +141,12 @@ export default {
                 console.log("loaded rights",_this.rightObj)
 						}
 						else{
-              _this.$message.error('获取权限失败，请刷新后重试');
+              _this.$message.error('get right fail,please try again later');
 						}
 					
 					})
 					.catch(function (error) {
-            _this.$message.error('获取权限失败，请刷新后重试'+error);
+            _this.$message.error('get right fail,please try again later'+error);
 					});
 			},
 			deep: true,
@@ -172,13 +172,13 @@ export default {
 					.post("http://localhost:5000/api/set_document_private/", formData, config)
 					.then(function (response) {
 						if (response.data.message=='success') {
-							_this.$message.success('修改成功');
+							_this.$message.success('successful edit');
 						} else {
-							_this.$message.error('修改失败');
+							_this.$message.error('edit fail');
 						}
 					})
 					.catch(function (error) {
-						_this.$message.error('修改失败'+error);
+						_this.$message.error('edit fail'+error);
 					});
       } else {
         if(this.rightObj.isleader) {
@@ -194,16 +194,16 @@ export default {
             .post("http://localhost:5000/api/group_doc_to_personal/", formData, config)
             .then(function (response) {
               if (response.data.message=='success') {
-                _this.$message.success('修改成功');
+                _this.$message.success('successful edit');
               } else {
-                _this.$message.error('修改失败');
+                _this.$message.error('edit fail');
               }
             })
             .catch(function (error) {
-              _this.$message.error('修改失败'+error);
+              _this.$message.error('edit fail'+error);
             });
         }else {
-          console.log("权限不足")
+          console.log("you don't have the right")
         }
       }
 		},
@@ -238,13 +238,13 @@ export default {
 					.post("http://localhost:5000/api/modify_personal_doc_right/", formData, config)
 					.then(function (response) {
 						if (response.data.message=='success') {
-							_this.$message.success('修改成功');
+							_this.$message.success('successful edit');
 						} else {
-							_this.$message.error('修改失败');
+							_this.$message.error('edit fail');
 						}
 					})
 					.catch(function (error) {
-						_this.$message.error('修改失败'+error);
+						_this.$message.error('edit fail'+error);
 					});
 			} else {
 				if(this.rightObj.isleader) {
@@ -266,16 +266,16 @@ export default {
 						.post("http://localhost:5000/api/modify_group_doc_right/", formData, config)
 						.then(function (response) {
 							if (response.data.message=='success') {
-								_this.$message.success('修改成功');
+								_this.$message.success('successful edit');
 							} else {
-								_this.$message.error('修改失败');
+								_this.$message.error('edit fail');
 							}
 						})
 						.catch(function (error) {
-							_this.$message.error('修改失败'+error);
+							_this.$message.error('edit fail'+error);
 						});
 				}else {
-					console.log("权限不足")
+					console.log("you don't have the right")
 				}
 			}
 		},

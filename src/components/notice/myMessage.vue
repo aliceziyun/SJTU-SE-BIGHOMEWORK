@@ -1,5 +1,18 @@
 <template>
   <div class="notice-box">
+    <a-modal
+      title="Send message to user"
+      :visible="messagebox"
+      @ok="SendMessage()"
+      @cancel="cancelMessage"
+    >
+      <template>
+        <a-input
+          v-model="my_message"
+          placeholder="Please type your message"
+        />
+      </template>
+    </a-modal>
     <a-table
       :columns="columns"
       :data-source="data"
@@ -9,8 +22,11 @@
       <a slot="name" slot-scope="text">{{ text }}</a>
       <span slot="customTitle"></span>
       <span slot="action" slot-scope="text,item">
-        <a-button type="primary" size="large" @click="agree_invitation(item.id)">
-          <a-icon type="check" />
+        <a-button type="primary" size="small" @click="agree_invitation(item.id)">
+          check
+        </a-button>
+        <a-button size="small" @click="Message(item.sender_name)">
+          reply
         </a-button>
         <a>{{ item.blank }}</a>
       </span>
@@ -26,16 +42,7 @@
 </style>
 
 <script type="text/ecmascript-6">
-// import { mavonEditor } from "mavon-editor";
-// import memberAvatar from '../team/memberAvatar';
-import "mavon-editor/dist/css/index.css";
 import axios from "axios";
-// import moment from "moment";
-import "@/utils/htmlToPdf.js";
-// import docxtemplater from 'docxtemplater'
-// import PizZip from 'pizzip'
-// import JSZipUtils from 'jszip-utils'
-// import {saveAs} from 'file-saver'
 const columns = [
   {
     title: "CONTENT",
@@ -63,6 +70,8 @@ export default {
     return {
       data,
       columns,
+      messagebox:false,
+      sender:"",
     };
   },
   mounted: function () {
@@ -80,7 +89,7 @@ export default {
       var _this = this;
       axios
         .post(
-          "http://192.168.1.111:5000/api/view_non_confirm_notice/",
+          "http://192.168.1.111:5000/api/view_message/",
           formData,
           config
         )
@@ -112,6 +121,48 @@ export default {
         })
         .catch(function (error) {
           console.log("Fail", error);
+        });
+    },
+    successmsg(message) {
+      this.$message.success(message);
+    },
+    errormsg(message) {
+      this.$message.error(message);
+    },
+    Message(name) {
+      this.messagebox = true;
+      this.sender = name;
+    },
+    cancelMessage() {
+      this.messagebox = false;
+    },
+    SendMessage(){
+      var _this = this;
+      let formData = new FormData();
+      console.log(this.sender);
+      formData.append("receiver", this.sender);
+      formData.append("sender", localStorage.getItem("token"));
+      formData.append("message", this.my_message);
+      let config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      axios
+        .post("http://192.168.1.111:5000/api/message_user/", formData, config)
+        .then(function (response) {
+          if (response.data.message == "success") {
+            _this.successmsg("successful message");
+            setTimeout(() => {
+                _this.messagebox=false;
+              }, 1000);
+          } 
+          else {
+            _this.errormsg("message fail!");
+          }
+        })
+        .catch(function () {
+          _this.errormsg("message fail,please try later!");
         });
     },
   },

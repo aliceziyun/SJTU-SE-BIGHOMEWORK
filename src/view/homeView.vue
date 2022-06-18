@@ -3,12 +3,12 @@
     <a-layout-sider
       :style="{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0 }"
     >
-      <div style="background:rgb(29, 130, 72)" class="logo">
+      <div style="background: rgb(29, 130, 72)" class="logo">
         <img src="../assets/cabbage.png" height="40px" />
         Cabbage
       </div>
       <a-menu
-        style="background:rgb(29, 130, 72);color:white"
+        style="background: rgb(29, 130, 72); color: white"
         mode="inline"
         @select="menuClick"
       >
@@ -32,10 +32,21 @@
           <a-icon type="question" />
           <span>HELP</span>
         </a-menu-item>
-        <a-menu-item key="message">
-          <a-icon type="bell" />
-          <span>MESSAGE</span>
-        </a-menu-item>
+        <a-sub-menu key="sub">
+          <template #title>MESSAGE</template>
+          <a-menu-item key="application">
+            <a-icon type="video-camera" />
+            <span class="nav-text">application</span>
+          </a-menu-item>
+          <a-menu-item key="invitation">
+            <a-icon type="upload" />
+            <span class="nav-text">invitation</span>
+          </a-menu-item>
+          <a-menu-item key="notice">
+            <a-icon type="info-circle" />
+            <span class="nav-text">notice</span>
+          </a-menu-item>
+        </a-sub-menu>
       </a-menu>
     </a-layout-sider>
     <a-layout :style="{ marginLeft: '200px' }">
@@ -53,7 +64,7 @@
         </div>
       </a-layout-content>
       <a-layout-footer :style="{ textAlign: 'center' }">
-        恭喜你发现了卷心菜文档
+        this is Cabbage Doc~ @sjtu
       </a-layout-footer>
     </a-layout>
   </a-layout>
@@ -86,6 +97,17 @@ export default {
           break;
         case "message":
           this.$router.push("/message/");
+          break;
+        // case "nav-text":
+        //   this.$router.push("")
+        case "application":
+          this.$router.push("/application");
+          break;
+        case "invitation":
+          this.$router.push("/invitation");
+          break;
+        case "notice":
+          this.$router.push("/notice/");
           break;
       }
     },
